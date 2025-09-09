@@ -3,7 +3,7 @@ import { getNumbers } from '../../utils';
 import classNames from 'classnames';
 
 type Props = {
-  total: string[];
+  total: number;
   perPage: number;
   currentPage: number;
   onPageChange: (page: number) => void;
@@ -15,29 +15,25 @@ export const Pagination: React.FC<Props> = ({
   onPageChange,
   currentPage,
 }) => {
-  const pages = Math.ceil(total.length / perPage);
-  const totalPages = getNumbers(1, pages);
+  const pagesCount = Math.ceil(total / perPage);
+  const pagesArray = pagesCount > 0 ? getNumbers(1, pagesCount) : [];
 
   const selectPage = (page: number) => {
-    onPageChange(page);
+    if (page !== currentPage) {
+      onPageChange(page);
+    }
   };
 
-  const prevButton = (
-    event: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
-  ) => {
+  const prevButton = (event: React.MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
-
     if (currentPage > 1) {
       onPageChange(currentPage - 1);
     }
   };
 
-  const nextButton = (
-    event: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
-  ) => {
+  const nextButton = (event: React.MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
-
-    if (currentPage < totalPages.length) {
+    if (currentPage < pagesCount) {
       onPageChange(currentPage + 1);
     }
   };
@@ -56,32 +52,31 @@ export const Pagination: React.FC<Props> = ({
         </a>
       </li>
 
-      {totalPages.map((page, index) => (
+      {pagesArray.map(page => (
         <li
-          key={index}
+          key={page}
           className={classNames('page-item', { active: currentPage === page })}
         >
-          <a
+          <button
             onClick={() => selectPage(page)}
             data-cy="pageLink"
             className="page-link"
-            href={`#${index + 1}`}
           >
             {page}
-          </a>
+          </button>
         </li>
       ))}
 
       <li
         className={classNames('page-item', {
-          disabled: currentPage === totalPages.length,
+          disabled: currentPage === pagesCount || pagesCount === 0,
         })}
       >
         <a
           data-cy="nextLink"
           className="page-link"
           href="#next"
-          aria-disabled={currentPage === totalPages.length}
+          aria-disabled={currentPage === pagesCount || pagesCount === 0}
           onClick={nextButton}
         >
           »
