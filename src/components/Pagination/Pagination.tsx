@@ -5,7 +5,7 @@ import classNames from 'classnames';
 type Props = {
   total: number;
   perPage: number;
-  currentPage: number;
+  currentPage?: number;
   onPageChange: (page: number) => void;
 };
 
@@ -13,9 +13,9 @@ export const Pagination: React.FC<Props> = ({
   total,
   perPage,
   onPageChange,
-  currentPage,
+  currentPage = 1,
 }) => {
-  const pagesCount = Math.ceil(total / perPage);
+  const pagesCount = perPage > 0 ? Math.ceil(total / perPage) : 0;
   const pagesArray = pagesCount > 0 ? getNumbers(1, pagesCount) : [];
 
   const selectPage = (page: number) => {
@@ -57,13 +57,17 @@ export const Pagination: React.FC<Props> = ({
           key={page}
           className={classNames('page-item', { active: currentPage === page })}
         >
-          <button
-            onClick={() => selectPage(page)}
+          <a
+            href={`#${page}`}
             data-cy="pageLink"
             className="page-link"
+            onClick={e => {
+              e.preventDefault();
+              selectPage(page);
+            }}
           >
             {page}
-          </button>
+          </a>
         </li>
       ))}
 
